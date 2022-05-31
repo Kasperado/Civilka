@@ -17,6 +17,8 @@ namespace Civilka.classes {
         List<Vertex>[] vGrid;
         List<Cell>[] cGrid;
         List<Cell>[] cGridFull;
+        int rows;
+        int cols;
         // Voronoi
         public List<Point> points = new List<Point>();
         public List<Vertex> vertices = new List<Vertex>();
@@ -43,9 +45,9 @@ namespace Civilka.classes {
             if (width % 100 != 0) throw new Exception("Width must be divisible by 100");
             if (height % 100 != 0) throw new Exception("Height must be divisible by 100");
             this.w = 20;
+            this.cols = (int)Math.Floor((double)this.width / this.w);
+            this.rows = (int)Math.Floor((double)this.height / this.w);
             // Veritices
-            int cols = (int)Math.Floor((double)this.width / this.w);
-            int rows = (int)Math.Floor((double)this.height / this.w);
             this.vGrid = new List<Vertex>[cols * rows];
             for (int i = 0; i < vGrid.Length; i++) {
                 this.vGrid[i] = new List<Vertex>();
@@ -61,11 +63,20 @@ namespace Civilka.classes {
                 this.cGridFull[i] = new List<Cell>();
             }
         }
+
+        public int getGridPosition(double x, double y) {
+            // Calculate in which grid cell those coordinates are
+            int vCol = (int)Math.Floor(x / this.w);
+            int vRow = (int)Math.Floor(y / this.w);
+            // If point is on the right or bottom border I must decrease grid cell position by one to avoid index out of range error
+            if (vCol == this.cols) vCol--;
+            if (vRow == this.rows) vRow--;
+            // Return position
+            return (vCol + vRow * this.cols);
+        }
         public void addNewVertex(Vertex newVertex) {
             // Since it's new vertex it needs to be checked agaist other ones
-            int vCol = (int)Math.Floor(newVertex.site.x / this.w);
-            int vRow = (int)Math.Floor(newVertex.site.y / this.w);
-            List<Vertex> gridCell = this.vGrid[vCol * vRow];
+            List<Vertex> gridCell = this.vGrid[getGridPosition(newVertex.site.x, newVertex.site.y)];
             for (int i = 0; i < gridCell.Count; i++) {
                 bool sameX = (gridCell[i].site.x == newVertex.site.x);
                 bool sameY = (gridCell[i].site.y == newVertex.site.y);
@@ -78,9 +89,7 @@ namespace Civilka.classes {
 
         public void addNewCell(Cell newCell) {
             // Since it's new cell it needs to be checked agaist other ones
-            int vCol = (int)Math.Floor(newCell.site.x / this.w);
-            int vRow = (int)Math.Floor(newCell.site.y / this.w);
-            List<Cell> gridCell = this.cGrid[vCol * vRow];
+            List<Cell> gridCell = this.cGrid[getGridPosition(newCell.site.x, newCell.site.y)];
             for (int i = 0; i < gridCell.Count; i++) {
                 bool sameX = (gridCell[i].site.x == newCell.site.x);
                 bool sameY = (gridCell[i].site.y == newCell.site.y);
@@ -100,6 +109,7 @@ namespace Civilka.classes {
                 List<Cell> active = activeGridCells[0];
             }
             return;
+            /*       
             for (int i = 0; i < cGridFull.Length; i++) {
                
             }
@@ -128,16 +138,13 @@ namespace Civilka.classes {
                 }
             }
 
-
             if (true) {
                 this.cGridFull[vCol * vRow].Add(newCell);
             }
-
+            */
         }
         public Vertex getVertexFromPosition(double vx, double vy) {
-            int vCol = (int)Math.Floor(vx / this.w);
-            int vRow = (int)Math.Floor(vy / this.w);
-            List<Vertex> gridCell = this.vGrid[vCol * vRow];
+            List<Vertex> gridCell = this.vGrid[getGridPosition(vx, vy)];
             for (int i = 0; i < gridCell.Count; i++) {
                 Vertex vertex = gridCell[i];
                 if (vertex.site.x == vx && vertex.site.y == vy) return vertex;
@@ -146,9 +153,7 @@ namespace Civilka.classes {
         }
 
         public Cell getCellFromPosition(double cx, double cy) {
-            int vCol = (int)Math.Floor(cx / this.w);
-            int vRow = (int)Math.Floor(cy / this.w);
-            List<Cell> gridCell = this.cGrid[vCol * vRow];
+            List<Cell> gridCell = this.cGrid[getGridPosition(cx, cy)];
             for (int i = 0; i < gridCell.Count; i++) {
                 Cell cell = gridCell[i];
                 if (cell.site.x == cx && cell.site.y == cy) return cell;
