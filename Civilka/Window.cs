@@ -19,7 +19,8 @@ namespace Civilka {
                 this.DoubleBuffered = true;
             }
 
-            protected override void OnMouseMove(MouseEventArgs e) { 
+            protected override void OnMouseMove(MouseEventArgs e) {
+                if (e.X < 0 || e.Y < 0 || e.X > gameData.width || e.Y > gameData.height) return;
                 this.gameData.mouseX = e.X;
                 this.gameData.mouseY = e.Y;
                 Cell targetCell = gameData.getCellFromMouse();
@@ -49,13 +50,14 @@ namespace Civilka {
                 Pen selPen = new Pen(Color.Red, 1);
                 SolidBrush myBrush = new SolidBrush(Color.Blue);
                 // Config
-                bool landmassDebug = false;
+                bool landmassDebug = true;
                 bool drawSimpleCells = true;
                 bool debugDetailedCells = false;
                 bool drawCellConnections = false;
 
 
                 // Fill cells
+                selPen.Color = Color.White;
                 for (int i = 0; i < this.gameData.cells.Count; i++) {
                     Cell cell = this.gameData.cells[i];
                     if (cell.type == Enums.CellType.LAND) myBrush.Color = Color.ForestGreen;
@@ -65,6 +67,7 @@ namespace Civilka {
                         fPoints[j] = new PointF((float)cell.vertices[j].site.x, (float)cell.vertices[j].site.y);
                     }
                     g.FillPolygon(myBrush, fPoints);
+                    g.DrawRectangle(selPen, (float)cell.site.x, (float)cell.site.y, 1, 1);
                 }
 
                 // Fill nations
