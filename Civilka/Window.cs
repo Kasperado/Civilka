@@ -33,10 +33,15 @@ namespace Civilka {
                 Refresh();
             }
 
-            protected override void OnMouseClick(MouseEventArgs e) {
+            protected override void OnMouseDown(MouseEventArgs e) {
                 // Get target cell and assign it to the 
                 Cell targetCell = gameData.getCellFromMouse();
                 if (targetCell == null) return;
+                // Unselect cell
+                if (gameData.selectedCell != null && targetCell.id == gameData.selectedCell.id) {
+                    gameData.selectedCell = null;
+                    return;
+                } 
                 gameData.selectedCell = targetCell;
                 // The rest
                 base.OnMouseMove(e);
