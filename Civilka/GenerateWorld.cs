@@ -1,4 +1,4 @@
-﻿using Civilka.classes;
+using Civilka.classes;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -402,8 +402,8 @@ namespace Civilka {
                     CellType type = CellType.OCEAN;
                     double fillX = point.x / gameData.width;
                     double fillY = point.y / gameData.height;
-                    int pixelPositionX = (int) (fillX * gameData.imageLand.Width);
-                    int pixelPositionY = (int) (fillY * gameData.imageLand.Height);
+                    int pixelPositionX = (int)(fillX * gameData.imageLand.Width);
+                    int pixelPositionY = (int)(fillY * gameData.imageLand.Height);
                     Color pixelData = gameData.imageLand.GetPixel(pixelPositionX, pixelPositionY);
                     if (pixelData.R == 0) {
                         type = CellType.LAND;
@@ -687,27 +687,10 @@ namespace Civilka {
                 nationsToSpawnCounter--;
             }
             // Populate nations with provinces
-            List<List<Province>> activeList = new List<List<Province>>();
-            for (int i = 0; i < nationsToSpawn; i++) {
-                List<Province> provinceList = new List<Province>();
-                provinceList.Add(gameData.nations[i].provinces[0]);
-                activeList.Add(provinceList);
-            }
-            // Each loop assign one province to the nation
-            while (activeList.Count > 0) {
-                int isEmpty = -1;
-                for (int i = 0; i < activeList.Count; i++) {
-                    // Check is province search should continue
-                    bool outOfPlaces = (activeList[i].Count == 0);
-                    bool isAtProvinceLimit = (outOfPlaces) ? false : (activeList[i][0].owner.provinces.Count >= provinceLimit);
-                    if (outOfPlaces || isAtProvinceLimit) {
-                        isEmpty = i; // Set which one of lists is empty and then remove it
-                        break;
-                    }
-                    // Add next province to the nation
-                    findNextProvince(activeList[i]);
+            for (int p = 0; p < (provinceLimit - 1); p++) {
+                for (int i = 0; i < gameData.nations.Count; i++) {
+                    gameData.nations[i].expand();
                 }
-                if (isEmpty != -1) activeList.RemoveAt(isEmpty);
             }
         }
         static bool wastelandTest(Province province) {
@@ -723,37 +706,6 @@ namespace Civilka {
                 }
             }
             return isSurrouded;
-        }
-        static void findNextProvince(List<Province> active) {
-            // Choose random active province
-            int randProvinceIndex = closestActiveToCapital(active);
-            Province randProvince = active[randProvinceIndex];
-            Nation randProvinceNation = randProvince.owner;
-            bool foundNextOne = false;
-            for (int j = 0; j < randProvince.neighbors.Count; j++) {
-                Province neighbor = randProvince.neighbors[j];
-                if (neighbor.owner != null) continue; // Already owned
-                randProvinceNation.addProvince(neighbor);
-                active.Add(neighbor);
-                foundNextOne = true;
-                break;
-            }
-            // Check if new neighbor was found
-            if (!foundNextOne) active.RemoveAt(randProvinceIndex);
-        }
-        static int closestActiveToCapital(List<Province> active) {
-            Cell capital = active[0].owner.capital.cell;
-            int closestIndex = 0;
-            double closestDistance = double.PositiveInfinity; // Anything will be lower than infinity
-            for (int i = 0; i < active.Count; i++) {
-                Province province = active[i];
-                double distance = Misc.distanceBetweenPoints(capital.site.x, capital.site.y, province.cell.site.x, province.cell.site.y);
-                if (distance < closestDistance) {
-                    closestIndex = i;
-                    closestDistance = distance;
-                }
-            }
-            return closestIndex;
         }
 
     }

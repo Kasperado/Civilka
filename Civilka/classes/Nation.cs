@@ -18,8 +18,6 @@ namespace Civilka.classes {
         public string color;
         public string borderColor;
         //this.relations = [];
-        // Test zone 
-        //this.administrativeReach = 30;
         public Nation() {
 
         }
@@ -82,7 +80,7 @@ namespace Civilka.classes {
                 Edge b = this.borders[i];
                 allBorders.Add(new BorderLink(b.va.site, b.vb.site));
             }
-           
+
             for (int i = 0; i < allBorders.Count; i++) {
                 BorderLink currentBorder = allBorders[i];
                 for (int j = 0; j < allBorders.Count; j++) {
@@ -134,84 +132,79 @@ namespace Civilka.classes {
 
             return null;
         }
+        // Finds province nearby and adds it to the civ
+        public void expand() {
+            bool addedProvince = false;
+            List<Province> validProvinces = new List<Province>(this.provinces);
+            while (!addedProvince) {
+                int randProvinceIndex = this.closestActiveToCapital(validProvinces);
+                Province randProvince = validProvinces[randProvinceIndex];
+                // Check if neighbor is valid
+                for (int j = 0; j < randProvince.neighbors.Count; j++) {
+                    Province neighbor = randProvince.neighbors[j];
+                    // Not owned
+                    if (neighbor.owner != null) continue;
+                    // Administrative reach
+                    double distance = Misc.distanceBetweenPoints(this.capital.cell.site.x, this.capital.cell.site.y, neighbor.cell.site.x, neighbor.cell.site.y);
+                    // All good
+                    this.addProvince(neighbor);
+                    addedProvince = true;
+                    break; // Add only one
+                }
+                // This randProvince is used
+                validProvinces.RemoveAt(randProvinceIndex);
+                // All valid options exhausted
+                if (validProvinces.Count == 0) break;
+            }
+        }
+        // Create new same culture civ nearby
+        void settle() {
+            List<Province> validProvinces = new List<Province>(this.provinces);
+            // Select province
+            for (int i = 0; i < validProvinces.Count; i++) {
+                Province province = validProvinces[i];
+                // No owner
+                if (province.owner != null) continue;
+                // Neighbours have no owners
+                bool nValid = true;
+                for (int n = 0; n < province.neighbors.Count; n++) {
+                    Province neighbor = province.neighbors[n];
+                    if (neighbor.owner != null) nValid = false;
+                }
+                if (!nValid) continue;
+                // Not too close not too far
+                double distance = Misc.distanceBetweenPoints(this.capital.cell.site.x, this.capital.cell.site.y, province.cell.site.x, province.cell.site.y);
+                if (distance > 40) continue;
+                // Land route
 
-        /*
-            // Finds province nearby and adds it to the civ
-            void expand() {
-                bool addedProvince = false;
-                let validProvinces = [...this.provinces];
-                while (!addedProvince) {
-                    int randProvinceIndex = this.closestActiveToCapital(validProvinces);
-                    let randProvince = validProvinces[randProvinceIndex];
-                    // Check if neighbor is valid
-                    for (int j = 0; j < randProvince.neighbors.length; j++) {
-                        let neighbor = randProvince.neighbors[j];
-                        // Not owned
-                        if (neighbor.owner !== null) continue;
-                        // Administrative reach
-                        let distance = distanceBetweenTwoPoints(this.capital.cell.site.x, this.capital.cell.site.y, neighbor.cell.site.x, neighbor.cell.site.y);
-                        if (distance > this.administrativeReach) continue;
-                        // All good
-                        this.addProvince(neighbor);
-                        addedProvince = true;
-                        break; // Add only one
-                    }
-                    // This randProvince is used
-                    validProvinces.splice(randProvinceIndex, 1);
-                    // All valid options exhausted
-                    if (validProvinces == 0) this.administrativeReach++;
-                    if (validProvinces == 0) break;
+                // Add new nation
+                Nation nation = new Nation();
+                string newColor = this.color;
+                //if (random() < 0.2) newColor = adjust(newColor, random(-100, 100));
+                nation.color = newColor;
+                nation.capital = province;
+                nation.addProvince(province);
+                // TODO add nation
+                //this.gameData.addNation(nation);
+                return; // Stop function
+            }
+            // If new settle place not found then expand instead
+            this.expand();
+        }
+        int closestActiveToCapital(List<Province> active) {
+            Cell capital = active[0].owner.capital.cell;
+            int closestIndex = 0;
+            double closestDistance = double.PositiveInfinity; // Anything will be lower than infinity
+            for (int i = 0; i < active.Count; i++) {
+                Province province = active[i];
+                double distance = Misc.distanceBetweenPoints(capital.site.x, capital.site.y, province.cell.site.x, province.cell.site.y);
+                if (distance < closestDistance) {
+                    closestIndex = i;
+                    closestDistance = distance;
                 }
             }
-            // Create new same culture civ nearby
-            void settle() {
-                let validProvinces = [...game.provinces];
-                // Select province
-                for (let i = 0; i < validProvinces.length; i++) {
-                    const province = validProvinces[i];
-                    // No owner
-                    if (province.owner != null) continue;
-                    // Neighbours have no owners
-                    let nValid = true;
-                    for (let n = 0; n < province.neighbors.length; n++) {
-                        let neighbor = province.neighbors[n];
-                        if (neighbor.owner != null) nValid = false;
-                    }
-                    if (!nValid) continue;
-                    // Not too close not too far
-                    let distance = distanceBetweenTwoPoints(this.capital.cell.site.x, this.capital.cell.site.y, province.cell.site.x, province.cell.site.y);
-                    if (distance > 40) continue;
-                    // Land route
-
-                    // Add new nation
-                    let nation = new Nation();
-                    let newColor = this.color;
-                    //if (random() < 0.2) newColor = adjust(newColor, random(-100, 100));
-                    nation.color = newColor;
-                    nation.capital = province;
-                    nation.addProvince(province);
-                    game.addNation(nation);
-                    return; // Stop function
-                }
-                // If new settle place not found then expand instead
-                this.expand();
-            }
-
-           int closestActiveToCapital(active) {
-                let capital = active[0].owner.capital.cell;
-                let closestIndex = 0;
-                let closestDistance = 9999; // // TODO:
-                for (int i = 0; i < active.length; i++) {
-                    let province = active[i];
-                    let distance = distanceBetweenTwoPoints(capital.site.x, capital.site.y, province.cell.site.x, province.cell.site.y);
-                    if (distance < closestDistance) {
-                        closestIndex = i;
-                        closestDistance = distance;
-                    }
-                }
-                return closestIndex;
-            }
-        */
+            return closestIndex;
+        }
 
     }
 
