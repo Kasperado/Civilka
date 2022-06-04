@@ -14,7 +14,7 @@ namespace Civilka {
        
         static void Main(string[] args) {
 
-            int width = 1400;
+            int width = 1000;
             int height = 800;
             GameData gameData = new GameData();
             gameData.width = width;
@@ -56,11 +56,9 @@ namespace Civilka {
                 Edge edge = gameData.edges[i];
                 edge.createNoisyBorders(2, 0.4);
             }
-            // Create land masses
-            Landmass a = WorldGeneration.createLandmass(12, new Point(width * 0.3f, height/2), 300f, 300f, 0.5, 0.0);
-            gameData.landmasses.Add(a);
-            Landmass b = WorldGeneration.createLandmass(12, new Point(width * 0.7f, height / 2), 300f, 300f, 0.5, 0.0);
-            gameData.landmasses.Add(b);
+            // Create landmass
+            Landmass l = WorldGeneration.createLandmass(24, new Point(width / 2, height / 2), (float)width*0.8, (float)height * 0.5, 0.7, 0.1);
+            gameData.landmasses.Add(l);
             // Give type to Cells (water, land)
             WorldGeneration.assignTypeToCells(gameData, gameData.landmasses);
             // Create provinces from land cells

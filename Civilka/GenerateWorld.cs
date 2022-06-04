@@ -1,4 +1,4 @@
-using Civilka.classes;
+﻿using Civilka.classes;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -320,45 +320,48 @@ namespace Civilka {
         }
         // Generate new polygon by creating points around center and them appling some jitter
         public static Landmass createLandmass(int numberOfCorners, Point centerPos, double landmassWidth, double landmassHeight, double pointJitter, double angleJitter) {
+            // Adjustment for futher calculations
+            landmassWidth /= 2;
+            landmassHeight /= 2;
             // Setup
             double angle = 0;
-            double angleStep = (Math.PI * 2) / numberOfCorners;
+            double angleStep = (Math.PI * 2) / numberOfCorners; // How much angle increases with each loop
             List<Point> randomPolyPoints = new List<Point>();
-            // Check size and if not box, then asses which dimension is bigger
-            bool isBox = (landmassWidth == landmassHeight);
-            bool isWidthBigger = false;
-            double biggerDimensionMultiplier = 0;
-            if (!isBox) {
-                isWidthBigger = (landmassWidth > landmassHeight);
-                if (isWidthBigger) biggerDimensionMultiplier = 1 + (((landmassWidth / landmassHeight) - 1) / 2);
-                else biggerDimensionMultiplier = 1 + (((landmassHeight / landmassWidth) - 1) / 2);
-            }
-            double power = (isBox) ? landmassWidth : (isWidthBigger ? landmassHeight : landmassWidth); // Smaller dimesion
+            // Check which dimension is bigger (if they are equal, this won't code affect the generation)
+            bool isWidthBigger = (landmassWidth > landmassHeight);
+            double biggerDimensionMultiplier;
+            if (isWidthBigger) biggerDimensionMultiplier = (landmassWidth / landmassHeight);
+            else biggerDimensionMultiplier = (landmassHeight / landmassWidth);
+            // Caclucate how much should points move in angle
+            double power = (isWidthBigger ? landmassHeight : landmassWidth); // Get smaller dimension
             // Calculate Random Polygon Points
             for (int i = 0; i < numberOfCorners; i++) {
-                double trueAngle = angle + (angleJitter * Misc.getRandomDouble(-angleStep / 2, angleStep / 2)); // Get current angle
                 Point polyPoint = new Point(centerPos.x, centerPos.y); // Create point in the middle
-                Point angleToAdd = new Point(Math.Cos(trueAngle - Math.PI), Math.Sin(trueAngle - Math.PI)); // Translate point to the desired location
+                // If landmass is not a square, it will be generated as an oval
+                double minusPI = angle - Math.PI;
+                double stregthPI = (Math.Abs(minusPI) / Math.PI) - 0.5;
+                Point fakePoint = new Point(centerPos.x, centerPos.y);
+                fakePoint.x -= power;
+                fakePoint.y -= power;
+                if (isWidthBigger) {
+                    double range = fakePoint.x - centerPos.x;
+                    double increase = (range * biggerDimensionMultiplier) - range;
+                    double additionalRange = increase * stregthPI * 2;
+                    polyPoint.x += additionalRange;
+                } else {
+                    double range = fakePoint.y - centerPos.y;
+                    double increase = (range * biggerDimensionMultiplier) - range;
+                    double additionalRange = increase * stregthPI * 2;
+                    polyPoint.y += additionalRange;
+                }
+                // Translate point to the desired location
+                double rngAngle = (angleJitter * Misc.getRandomDouble(-angleStep / 2, angleStep / 2)); // Apply angle jitter
+                double trueAngle = angle + rngAngle; // Get current angle
+                Point angleToAdd;
+                if (isWidthBigger) angleToAdd = new Point(Math.Cos(trueAngle - Math.PI), Math.Sin(trueAngle - Math.PI));
+                else angleToAdd = new Point(Math.Sin(trueAngle - Math.PI), Math.Cos(trueAngle - Math.PI));
                 polyPoint.x += angleToAdd.x * power;
                 polyPoint.y += angleToAdd.y * power;
-                // TODO oval
-                if (!isBox) {
-                    double minusPI = angle - Math.PI;
-                    double stregthPI = Math.Abs(minusPI) / Math.PI;
-                    // Get range
-                    //                 let fakeVec = p5.Vector.fromAngle(0);
-                    Point fakePos = new Point(centerPos.x, centerPos.y);
-                    //                fakeVec.setMag(m); // Move in m direction
-                    //               fakeVec.add(fakePos);
-                    if (isWidthBigger) {
-                        //                   double range = fakeVec.x - startPos.x;
-                        //                  double increase = (range * biggerDimensionMultiplier) - range;
-                        //                  double additionalRange = increase * stregthPI;
-                        //                  startPos.x += additionalRange;
-                    } else {
-
-                    }
-                }
                 // Add point jitter
                 double pja = pointJitter * power / 2;
                 double jitterX = Misc.getRandomDouble(-pja, pja);
