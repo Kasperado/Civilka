@@ -100,48 +100,6 @@ namespace Civilka.classes {
             newCell.id = cellID;
             gridCell.Add(newCell); // Add to grid cell
             this.cells.Add(newCell); // Add to list
-
-            // Start with initial one and if it breaks out add to active
-            // TODO uniform grid
-            List<List<Cell>> activeGridCells = new List<List<Cell>>();
-            //activeGridCells.Add(gridCell); // Add initial one
-            while (activeGridCells.Count > 0) {
-                List<Cell> active = activeGridCells[0];
-            }
-            return;
-            /*       
-            for (int i = 0; i < cGridFull.Length; i++) {
-               
-            }
-
-            Point nw = new Point(vCol * this.w, vRow * this.w);
-            Point ne = new Point(vCol * this.w + this.w, vRow * this.w);
-            Point se = new Point(vCol * this.w + this.w, vRow * this.w + this.w);
-            Point sw = new Point(vCol * this.w, vRow * this.w + this.w);
-            for (int i = 0; i < newCell.edges.Count; i++) {
-                Edge edge = newCell.edges[i];
-                // North
-                if (Misc.lineIntersects(nw.x, nw.y, ne.x, ne.y, edge.va.site.x, edge.va.site.y, edge.vb.site.x, edge.vb.site.y)) {
-
-                }
-                // East
-                if (Misc.lineIntersects(ne.x, ne.y, se.x, se.y, edge.va.site.x, edge.va.site.y, edge.vb.site.x, edge.vb.site.y)) {
-
-                }
-                // South
-                if (Misc.lineIntersects(se.x, se.y, sw.x, sw.y, edge.va.site.x, edge.va.site.y, edge.vb.site.x, edge.vb.site.y)) {
-
-                }
-                // West
-                if (Misc.lineIntersects(sw.x, sw.y, nw.x, nw.y, edge.va.site.x, edge.va.site.y, edge.vb.site.x, edge.vb.site.y)) {
-
-                }
-            }
-
-            if (true) {
-                this.cGridFull[vCol * vRow].Add(newCell);
-            }
-            */
         }
         public Vertex getVertexFromPosition(double vx, double vy) {
             List<Vertex> gridCell = this.vGrid[getGridPosition(vx, vy)];
@@ -161,13 +119,10 @@ namespace Civilka.classes {
             return null;
         }
         public Cell getCellFromMouse() {
-            int vCol = (int)Math.Floor((double)mouseX / this.w);
-            int vRow = (int)Math.Floor((double)mouseY / this.w);
-            List<Cell> gridCell = this.cGridFull[vCol * vRow];
-            // TODO
+            // TODO (?) - This solution is not 'efficient', but it does the job quickly enough. (3ms with 10k cells)
             for (int i = 0; i < this.cells.Count; i++) {
                 Cell cell = cells[i];
-                if (Misc.isPointInPoly(new Point(mouseX, mouseY), cell.edges)) return cell;
+                if (Misc.isPointInPoly(new Point(this.mouseX, this.mouseY), cell.edges)) return cell;
             }
             return null;
         }
