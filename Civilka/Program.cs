@@ -1,6 +1,7 @@
 ﻿using Civilka.classes;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -16,17 +17,18 @@ namespace Civilka {
 
             int width = 1000;
             int height = 800;
+            bool useImageForLandmass = false;
             GameData gameData = new GameData();
             gameData.width = width;
             gameData.height = height;
             gameData.init();
             Console.WriteLine("Seed: " + Misc.seedUsed);
-
-            // TODO - ask user for image location
-            // TODO - relative path
-            //string fileSpec = @"ABSOLUTE-PATH-TO-IMAGE";
-            //gameData.imageLand = new Bitmap(fileSpec, true);
-
+            // Use image for map 
+            if (useImageForLandmass) {
+                string folder = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
+                string map = folder + @"\maps\usa.png";
+                gameData.imageLand = new Bitmap(map, true);
+            }
             // Generate Points
             Console.WriteLine("---Stopwatch START---");
             Misc.stopWatch.Start();
@@ -57,8 +59,7 @@ namespace Civilka {
                 edge.createNoisyBorders(2, 0.4);
             }
             // Create landmass
-            Landmass l = WorldGeneration.createLandmass(24, new Point(width / 2, height / 2), (float)width*0.8, (float)height * 0.5, 0.7, 0.1);
-            gameData.landmasses.Add(l);
+            if (!useImageForLandmass) gameData.landmasses.Add(WorldGeneration.createLandmass(24, new Point(width / 2, height / 2), (float)width * 0.8, (float)height * 0.5, 0.7, 0.1));
             // Give type to Cells (water, land)
             WorldGeneration.assignTypeToCells(gameData, gameData.landmasses);
             // Create provinces from land cells
