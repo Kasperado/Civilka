@@ -56,6 +56,7 @@ namespace Civilka {
                 SolidBrush myBrush = new SolidBrush(Color.Blue);
                 // Config
                 bool landmassDebug = true;
+                bool drawGrid = false;
                 bool drawSimpleCells = true;
                 bool debugDetailedCells = false;
                 bool drawCellConnections = false;
@@ -207,6 +208,18 @@ namespace Civilka {
                     }
                 }
                 g.DrawRectangle(selPen, (float)gameData.mouseX, (float)gameData.mouseY, 1, 1);
+                // Draw grid
+                if (drawGrid) {
+                    selPen.Color = Color.Red;
+                    selPen.Width = 1;
+                    int tileSize = this.gameData.w;
+                    for (int i = 0; i < this.gameData.cols; i++) {
+                        g.DrawLine(selPen, (float)i * tileSize, (float)0, (float)i * tileSize, (float)this.gameData.height);
+                    }
+                    for (int y = 0; y < this.gameData.rows; y++) {
+                        g.DrawLine(selPen, (float)0, (float)y * tileSize, (float)this.gameData.width, (float)y * tileSize);
+                    }
+                }
 
             }
 

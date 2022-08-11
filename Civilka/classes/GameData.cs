@@ -13,12 +13,13 @@ namespace Civilka.classes {
         public int mouseX = 0;
         public int mouseY = 0;
         // Transfer acceleration | Uniform grids will help with that // 3000ms -> 75ms on 1400:800 (10 mDistance)
-        int w;
+        public int w;
         List<Vertex>[] vGrid;
         List<Cell>[] cGrid;
         List<Cell>[] cGridFull;
         int rows;
-        int cols;
+        public int rows;
+        public int cols;
         // Voronoi
         public List<Point> points = new List<Point>();
         public List<Vertex> vertices = new List<Vertex>();
