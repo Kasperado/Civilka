@@ -23,12 +23,12 @@ namespace Civilka {
                 if (e.X < 0 || e.Y < 0 || e.X > gameData.width || e.Y > gameData.height) return;
                 this.gameData.mouseX = e.X;
                 this.gameData.mouseY = e.Y;
-                Cell targetCell = gameData.getCellFromMouse();
                 if (gameData.selectedCell != null) {
+                    Cell targetCell = gameData.getCellFromMouse();
                     if (gameData.selectedCell.type == Enums.CellType.OCEAN) gameData.path = Pathfinding.aStarPathfinding(gameData.waterCells, gameData.selectedCell, targetCell);
                     if (gameData.selectedCell.type == Enums.CellType.LAND) gameData.path = Pathfinding.aStarPathfinding(gameData.landCells, gameData.selectedCell, targetCell);
                 }
-                    
+
                 base.OnMouseMove(e);
                 Refresh();
             }
@@ -60,8 +60,6 @@ namespace Civilka {
                 bool drawSimpleCells = true;
                 bool debugDetailedCells = false;
                 bool drawCellConnections = false;
-
-
                 // Fill cells
                 selPen.Color = Color.White;
                 for (int i = 0; i < this.gameData.cells.Count; i++) {
@@ -220,7 +218,7 @@ namespace Civilka {
                         g.DrawLine(selPen, (float)0, (float)y * tileSize, (float)this.gameData.width, (float)y * tileSize);
                     }
                 }
-
+                
             }
 
         }
