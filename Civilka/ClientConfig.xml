@@ -1,0 +1,16 @@
+<ClientConfig>
+    <General
+        language="English"  
+    />
+    <Gameplay
+        firstTimePlaying="true"
+    />
+    <Graphics
+        width="1920"
+        height="1080"
+    />
+    <Audio
+        musicVolume="1.0"
+        soundVolume="1.0"
+    />
+</ClientConfig>

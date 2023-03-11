@@ -14,7 +14,8 @@ namespace Civilka {
     internal class Program {
        
         static void Main(string[] args) {
-
+            // Load configuration files
+            Config.loadConfig();
             int width = 1000;
             int height = 800;
             bool useImageForLandmass = false;
