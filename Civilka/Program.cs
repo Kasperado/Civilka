@@ -59,6 +59,8 @@ namespace Civilka {
                 Edge edge = gameData.edges[i];
                 edge.createNoisyBorders(2, 0.4);
             }
+            // Assign cells to uniform grid
+            gameData.cells.ForEach(cell => gameData.assignCellToGrid(cell));
             // Create landmass
             if (!useImageForLandmass) gameData.landmasses.Add(WorldGeneration.createLandmass(24, new Point(width / 2, height / 2), (float)width * 0.8, (float)height * 0.5, 0.7, 0.1));
             // Give type to Cells (water, land)
@@ -73,7 +75,7 @@ namespace Civilka {
             WorldGeneration.spawnNations(10, minDistance*2, 10, gameData);
             Misc.stopWatch.Stop();
             Console.WriteLine("---Stopwatch END---");
-
+            
             // Post generation report
             Console.WriteLine("Points: " + gameData.points.Count);
             Console.WriteLine("Vertices: " + gameData.vertices.Count);

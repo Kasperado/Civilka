@@ -22,8 +22,8 @@ namespace Civilka {
         }
         public static bool isPointInPoly(Point point, List<Edge> edges) {
             bool inCell = false;
-            // Raycast line
-            Point[] rayCast = { new Point(-1000, -1000), new Point(point.x, point.y) };
+            // Raycast line | Angle should not be 0, 45 or 90 deq - it will cause problems on map edges and when inserting cells to tile grid
+            Point[] rayCast = { new Point(-1, -10), new Point(point.x, point.y) };
             // Every all edges
             for (int i = 0; i < edges.Count; i++) {
                 Edge e = edges[i];
